@@ -101,8 +101,12 @@ public class Sports extends AppCompatActivity {
             for(int i = 0; i<arr.length(); i++){
                 JSONObject temp = arr.getJSONObject(i);
                 list.add(temp.getString("title"));
-                Map<String,String> map = News_String.map;
-                map.put(temp.getString("title"),temp.getString("description"));
+                Map<String,ArrayList<String>> map = News_String.map;
+                ArrayList<String> li = new ArrayList<>();
+                li.add(temp.getString("description"));
+                li.add(temp.getString("urlToImage"));
+                li.add(temp.getString("url"));
+                map.put(temp.getString("title"),li);
             }
 
 

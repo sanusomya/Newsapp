@@ -2,6 +2,8 @@ package com.example.networking;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -32,44 +35,29 @@ public class News extends AppCompatActivity {
         setContentView(R.layout.activity_news);
         TextView headline = findViewById(R.id.news_headline);
         TextView disc = findViewById(R.id.news_discription);
+        TextView url = findViewById(R.id.news_url);
         headline.setText(News_String.s);
-        disc.setText(News_String.map.get(News_String.s));
-
+        ArrayList<String> li =  News_String.map.get(News_String.s);
+        if(li.get(0).length() == 0) disc.setVisibility(View.INVISIBLE);
+        disc.setText(li.get(0));
+        if(li.get(2).length() == 0) disc.setVisibility(View.INVISIBLE);
         ImageView rad = findViewById(R.id.random);
-
-        final String A = "https://api.pexels.com/v1/";
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(A).build();
-        client.newCall(request).enqueue(new Callback() {
+        create(li.get(1),rad);
+        url.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    String json = response.body().string();
-                    News.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            create(json,rad);
-                        }
-                    });
-                }
+            public void onClick(View view) {
+                String s = li.get(2);
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(s));
+                startActivity(i);
             }
         });
+
     }
     private void create(String h, ImageView v){
         if(h == ""){
             Toast.makeText(this,"Empty Response",Toast.LENGTH_LONG).show();
         }
-        try {
-            JSONObject root = new JSONObject(h);
-            String s = root.getString("message");
-            Picasso.get().load(s).into(v);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Picasso.get().load(h).into(v);
     }
 }
